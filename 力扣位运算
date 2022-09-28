@@ -15,7 +15,8 @@ bool isPowerOfTwo(int n){
 bool isPowerOfTwo2(int n){
     return n > 0 && (n & -n) == n;
 }
-//2.给定两个整数，去寻找这两个整数之间有多少个数的二进制表示里有质数个1
+//2.lc762
+//给定两个整数，去寻找这两个整数之间有多少个数的二进制表示里有质数个1
 //条件有l,r均小于10^6.
 //10^6小于2^20,也就是这个数最多是20位，那么最多的质数个数是19
 int countPrimerSetBits(int L,int R){
@@ -29,13 +30,15 @@ int countPrimerSetBits(int L,int R){
     }
     return res;
 }
-//3.给予一个数组，除了一个数其他数出现的次数都是偶数，找出那个出现次数不是偶数的数找出来
+//3.lc136
+//给予一个数组，除了一个数其他数出现的次数都是偶数，找出那个出现次数不是偶数的数找出来
 int singleNumber(vector<int>& nums){
     int res = 0;
     for(auto x : nums)res ^= x;//相同的两个数^为0
     return res;
 }
-//4.给出一个正整数，求出它的反码
+//4.lc476
+//给出一个正整数，求出它的反码
 int findComplement(int num){
     int res = 0,t = 0;
     while(num){
@@ -47,7 +50,8 @@ int findComplement(int num){
     // return ~num;
     //直接取反是不可以的，这样会把前面的0也取反
 }
-//5.给出一个数组，只有一个数出现一次，其他所有数都出现了三次，让我们把出现一次的数找出来
+//5.lc137
+//给出一个数组，只有一个数出现一次，其他所有数都出现了三次，让我们把出现一次的数找出来
 //我们可以模拟一位是正确的，从而推出32位都是正确的
 //初始：0 0
 //1个1：1 0
@@ -62,7 +66,8 @@ int singleNumber(vector<int>& nums){
     }
     return ones;
 }
-//6.给一个数组，只有两个数出现了一次，其他数出现了两次，找出这两个数
+//6.面试题51
+//给一个数组，只有两个数出现了一次，其他数出现了两次，找出这两个数
 vector<int>singleNumber(vector<int>& nums){
     int s = 0;
     for (auto x : nums) s ^= x;
@@ -79,7 +84,8 @@ vector<int>singleNumber(vector<int>& nums){
      //s ^ s2 = a^ b ^ a = b
     return vector<int>({s2,s^s2});
 }
-//7.给出两个整数a和b，算出两个整数a+b的和，不能使用加法和减法
+//7.lc371
+//给出两个整数a和b，算出两个整数a+b的和，不能使用加法和减法
 int getSum(int a,int b){
     if(!b)return a;
     int sum = a ^ b;//不进位加法的结果
@@ -87,7 +93,8 @@ int getSum(int a,int b){
     //时候这一位和另一个数的这一位相加，结果还是0，并且又左移一位，保证了最后两位是0，最后carry的结果变成0
     return getSum(sum,carry);//将进位和不进位加法结果相加，什么时候没有进位了，什么时候返回结果
 }
-//8.给定范围m,n,返回这个区间内所有数与的结果
+//8.lc201
+//给定范围m,n,返回这个区间内所有数与的结果
 //如果范围较大，从直觉上来讲，后几位都是0，因为都是连续的
 int rangeBitwiseAnd(int m,int n){
     int res = 0;
@@ -101,7 +108,8 @@ int rangeBitwiseAnd(int m,int n){
     }
     return res;
 }
-//9.韩明距离是两个整数二进制不同的位数的个数
+//9.lc477
+//韩明距离是两个整数二进制不同的位数的个数
 //求所有整数对汉明距离的和
 //一组数某一位的汉明距离等于0的个数*1的个数，0堆里面挑一个，1堆里面挑一个，这就产生了一个汉明
 int totalHammingDistance(vector<int>& nums){
