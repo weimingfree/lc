@@ -66,7 +66,7 @@ int singleNumber(vector<int>& nums){
     }
     return ones;
 }
-//6.面试题51
+//6.面试题56 1
 //给一个数组，只有两个数出现了一次，其他数出现了两次，找出这两个数
 vector<int>singleNumber(vector<int>& nums){
     int s = 0;
