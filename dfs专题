@@ -1,0 +1,298 @@
+#include <iostream>
+#include <set>
+#include <unordered_set>
+#include <vector>
+#include <queue>
+#include <algorithm>
+#include <stack>
+#include <map>
+#include <unordered_map>
+using namespace std;
+//1.lc784字母大小写全排列给定
+// 一个字符串 s ，通过将字符串 s 中的每个字母转变大小写，我们可以获得一个新的字符串。
+//返回 所有可能得到的字符串集合 。以 任意顺序 返回输出。
+vector<string>ans;
+void dfs(string S,int u){
+    if(u == S.size()){
+        ans.push_back(S);
+        return;
+    }
+    dfs(S,u+1);//不变的情况
+    if(S[u] >= 'A'){
+        S[u] ^= 32;//大小写变化
+        dfs(S,u+1);
+    }
+}
+vector<string> letterCasePermutation(string S){
+    dfs(S,0);
+    return ans;
+}
+//2.lc77组合
+// 给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。
+//你可以按任何顺序返回答案。
+vector<vector<int>> ans;
+void dfs(vector<int>&path,int start,int n,int k){
+    if(!k){
+        ans.push_back(path);
+        return;
+    }
+    for(int i = start;i <= n;i++){
+        path.push_back(i);
+        dfs(path,i+1,n,k-1);
+        path.pop_back();
+    }
+}
+
+vector<vector<int>>combine(int n,int k){
+    vector<int>path;
+    dfs(path,1,n,k);
+    return ans;
+}
+//3.lc257二叉树的所有路径
+// 给你一个二叉树的根节点 root ，按 任意顺序 ，返回所有从根节点到叶子节点的路径。
+//叶子节点 是指没有子节点的节点。
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+ vector<string>ans;
+ void dfs(TreeNode* root,string path){
+     if(!root)return;
+     if(path.size())path+="->";
+     path += to_string(root->value);
+     if(!root->left && !root->right)ans.push_back(path);
+     else{
+         dfs(root->left,path);
+         dfs(root->right,path);
+     }
+ }
+ vector<string> binaryTreePaths(TreeNode* root){
+     string path;
+     dfs(root,path);
+     return ans;
+ }
+ //4.lc93复制IP地址
+ // 有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
+//例如："0.1.2.201" 和 "192.168.1.1" 是 有效 IP 地址，但是 "0.011.255.245"、"192.168.1.312" 和 "192.168@1.1" 是 无效 IP 地址。
+//给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过在 s 中插入'.' 来形成。
+//你不能重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
+vector<string>ans;
+ void dfs(string &s,int u,int k,string path){
+     if( u == s.size()){
+         if(k == 4){
+             ans.push_back(path.substr(1));//去掉第一位的小数点
+         }
+         return;
+     }
+     if(k > 4)return;
+     if(s[u] == '0')dfs(s,u+1,k+1,path+".0");
+     else{
+         for(int i = u,t= 0;i < s.size();i++){
+             t = t * 10 + s[i] - '0';//将ASCII码转换为数字
+             if(t < 256)dfs(s,i+1,k+1,path + '.' + to_string(t));
+             else break;
+         }
+     }
+ }
+ vector<string>restoreIpAddresses(string s){
+     string path;
+     dfs(s,0,0,path);
+     return ans;
+ }
+ /**5.lc95不同的二叉搜索树2
+ //给你一个整数 n ，请你生成并返回所有由 n 个节点组成且节点值从 1 到 n 互不相同的不同 二叉搜索树 。可以按任意顺序返回答案。*/
+/**
+* Definition for a binary tree node.
+* struct TreeNode {
+*     int val;
+*     TreeNode *left;
+*     TreeNode *right;
+*     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+*     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+*     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+* };
+*/
+vector<TreeNode*>dfs(int l,int r){
+    vector<TreeNode*>res;
+    if(l>r){
+        res.push_back(NULL);
+        return res;
+    }
+    for(int i = l;i <= r;i++){
+        auto left = dfs(l,i-1),right = dfs(i+1,r);
+        for(auto &lt : left)
+            for(auto &rt:right){
+                auto root = new TreeNode(i);
+                root->left = lt,root->right = rt;
+                res.push_back(root);
+            }
+    }
+    return res;
+
+}
+vector<TreeNode*>generateTrees(int n){
+    if(!n)return vector<TreeNode*>();
+    return dfs(1,n);
+}
+/**
+6.lc394字符串解码
+给定一个经过编码的字符串，返回它解码后的字符串。
+编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。注意 k 保证为正整数。
+你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k ，例如不会出现像3a或2[4]的输入。
+*/
+string decodeString(string s){
+    string res;
+    for(int i = 0;i < s.size();){
+        if(!isdigit(s[i]))res += s[i++];
+        else{
+            int k = 0;
+            while (isdigit(s[i])) k = k* 10+s[i++] - '0';
+            int j = i+1,sum = 1;
+            while (sum > 0){
+                if(s[j] == '[')sum++;
+                if(s[j] == ']')sum--;
+                j++;
+            }
+            string r = decodeString(s.substr(i+1,j-i-2));
+            while (k--)res += r;
+            i = j;
+        }
+    }
+    return res;
+}
+/**
+7.lc341扁平化嵌套列表迭代器
+给你一个嵌套的整数列表 nestedList 。每个元素要么是一个整数，要么是一个列表；
+该列表的元素也可能是整数或者是其他列表。请你实现一个迭代器将其扁平化，使之能够遍历这个列表中的所有整数。
+实现扁平迭代器类 NestedIterator ：
+NestedIterator(List<NestedInteger> nestedList) 用嵌套列表 nestedList 初始化迭代器。
+int next() 返回嵌套列表的下一个整数。
+boolean hasNext() 如果仍然存在待迭代的整数，返回 true ；否则，返回 false
+This is the interface that allows for creating nested lists.
+ * You should not implement it, or speculate about its implementation
+ * class NestedInteger {
+ *   public:
+ *     // Return true if this NestedInteger holds a single integer, rather than a nested list.
+ *     bool isInteger() const;
+ *     // Return the single integer that this NestedInteger holds, if it holds a single integer
+ *     // The result is undefined if this NestedInteger holds a nested list
+ *     int getInteger() const;
+ *     // Return the nested list that this NestedInteger holds, if it holds a nested list
+ *     // The result is undefined if this NestedInteger holds a single integer
+ *     const vector<NestedInteger> &getList() const;
+ */
+ vector<int>seq;
+ int cnt = 0;
+ void dfs(vector<NestedIterator> & nestedList){
+     for(auto &l : nestedList){
+         if(l.isInteger())seq.push_back(l.getInter());
+         else dfs(l.getList());
+     }
+ }
+NestedIterator(vector<NestedInteger> &nestedList) {
+    dfs(nestedList);
+}
+int next() {
+    return seq[cnt++];
+}
+bool hasNext() {
+    return cnt < seq.size();
+}
+/**
+ * 8.lc756金字塔转化矩阵
+ * 你正在把积木堆成金字塔。每个块都有一个颜色，用一个字母表示。每一行的块比它下面的行 少一个块 ，并且居中。
+为了使金字塔美观，只有特定的三角形图案是允许的。一个三角形的图案由两个块和叠在上面的单个块组成。
+模式是以三个字母字符串的列表形式allowed给出的，其中模式的前两个字符分别表示左右底部块，第三个字符表示顶部块。
+例如，"ABC"表示一个三角形图案，其中一个 “C” 块堆叠在一个'A'块(左)和一个'B'块(右)之上。请注意，这与 "BAC"不同，"B"在左下角，"A"在右下角。
+你从底部的一排积木bottom开始，作为一个单一的字符串，你 必须 使用作为金字塔的底部。
+在给定bottom和allowed的情况下，如果你能一直构建到金字塔顶部，使金字塔中的 每个三角形图案 都是允许的，则返回 true ，否则返回 false 。
+ * */
+ vector<char>allows[7][7];
+ bool dfs(string & last,string now){
+     if(last.size() == 1)return true;
+     if(now.size() + 1 == last.size())return dfs(now,"");
+     int a = last[now.size()] - 'A',b = last[now.size() + 1] - 'A';
+     for(auto c : allows[a][b]){
+         if(dfs(last,now+c))return true;
+     }
+     return false;
+ }
+ bool pyramidTransition(string bottom, vector<string>& allowed) {
+    for(auto allow : allowed){
+        int a = allow[0]-'A',b = allow[1]-'A',c = allow[2];
+        allows[a][b].push_back(c);
+    }
+    return dfs(bottom,"");
+}
+/**LC79单词搜索
+ * 给定一个m x n 二维字符网格board 和一个字符串单词word 。如果word 存在于网格中，返回 true ；否则，返回 false 。
+单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。
+同一个单元格内的字母不允许被重复使用。
+*/
+int n,m;
+vector<vector<char>>board;
+vector<vector<bool>> st;
+string word;
+bool dfs(int x,int y,int u){
+    if(u == word.size())return true;
+    st[x][y] = true;
+    int dx[4] = {-1,0,1,0},dy[4] = {0,1,0,-1};
+    for(int i = 0;i < 4;i++){
+        int a = x + dx[i],b = y + dy[i];
+        if(a >= 0 && a < n && b >= 0 && b < m && !st[a][b] && board[a][b] == word[u]){
+            if(dfs(a,b,u+1))return true;
+        }
+    }
+    st[x][y] = false;
+    return false;
+}
+bool exist(vector<vector<char>>& _board, string _word) {
+    board = _board,word = _word;
+    n = board.size(),m = board[0].size();
+    st = vector<vector<bool>>(n,vector<bool>(m, false));
+    for(int i = 0;i < n;i++)
+        for(int j = 0;j <m;j++){
+            if(board[i][j] == word[0]){
+                if(dfs(i,j,1))return true;
+            }
+        }
+    return false;
+}
+/**lc464我能赢吗
+ *在 "100 game" 这个游戏中，两名玩家轮流选择从 1 到 10 的任意整数，累计整数和，先使得累计整数和 达到或超过100的玩家，即为胜者。
+如果我们将游戏规则改为 “玩家 不能 重复使用整数” 呢？
+例如，两个玩家可以轮流从公共整数池中抽取从 1 到 15 的整数（不放回），直到累计整数和 >= 100。
+给定两个整数maxChoosableInteger（整数池中可选择的最大数）和desiredTotal（累计和），若先出手的玩家是否能稳赢则返回 true，否则返回 false 。
+ 假设两位玩家游戏时都表现 最佳 。
+ * */
+ bool CaniWin(int status,vector<unordered_map<int,bool>>&dp,int maxn,int desire) {
+    if (dp[desire].count(status))//如果这个状态之前搜过，就不必再搜了
+        return dp[desire][status];
+    for (int i = maxn - 1; i >= 0; --i) {
+        if (!(status & (1 << i))) {//判断status第i位是不是0，如果是0，这一位没有被选过，我们就选择它
+            status |= (1 << i);
+            if (i + 1 >= desire || !CaniWin(status, dp, maxn, desire - 1 - i)) {//或者对手必败
+                dp[desire][status] = true;
+                return true;
+            }
+            status ^= (1<<i);
+        }
+    }
+    dp[desire][status] = false;
+    return false;
+}
+bool canIWin(int max, int desire) {
+        int status = 0;
+    if(desire <= 1)return true;
+    if(max*(max+1) < desire*2)return false;//总和加一起比desire小，谁都不可能赢
+    vector<unordered_map<int,bool>>dp(desire+1);
+    return CaniWin(status,dp,max,desire);
+}
