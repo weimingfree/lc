@@ -1,0 +1,148 @@
+#include <iostream>
+#include <set>
+#include <unordered_set>
+#include <vector>
+#include <queue>
+#include <algorithm>
+#include <stack>
+#include <map>
+#include <unordered_map>
+#include <math.h>
+using namespace std;
+/**1.lc268丢失的数字
+ * 给定一个包含 [0, n] 中 n 个数的数组 nums ，找出 [0, n] 这个范围内没有出现在数组中的那个数。
+ * */
+int missingNumber(vector<int>& nums) {
+    int sum = 0;
+    for(auto x : nums)sum+= x;
+    return nums.size() * (nums.size()+1) /2 - sum;
+}
+/**2.lc62不同路径
+ * 一个机器人位于一个 m x n网格的左上角 （起始点在下图中标记为 “Start” ）。
+机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。
+问总共有多少条不同的路径？
+*/
+int uniquePaths(int m, int n) {
+    vector<vector<int>>f(n,vector<int>(m,0));
+    f[0][0] = 1;
+    for(int i = 0;i < n;i++)
+        for(int j = 0;j < m;j++)
+            if(i || j){
+                if(i)f[i][j] += f[i-1][j];
+                if(j)f[i][j] += f[i][j-1];
+            }
+    return f[n-1][m-1];
+}
+/**3.lc462最小操作次数使数组元素相等II
+ * 给你一个长度为 n 的整数数组 nums ，返回使所有数组元素相等需要的最小操作数。
+在一次操作中，你可以使数组中的一个元素加 1 或者减 1 。
+ * */
+int minMoves2(vector<int>& nums) {
+    int res = 0;
+    int n = nums.size();
+    nth_element(nums.begin(),nums.begin()+n/2,nums.end());
+    int x = nums[n/2];
+    for(auto y :nums)res += abs(x-y);
+    return res;
+}
+/**lc458可怜的小猪
+ *有buckets桶液体，其中正好有一桶含有毒药，其余装的都是水。它们从外观看起来都一样。为了弄清楚哪只水桶含有毒药，你可以喂一些猪喝，
+ *通过观察猪是否会死进行判断。不幸的是，你只有minutesToTest分钟时间来确定哪桶液体是有毒的。
+喂猪的规则如下：
+选择若干活猪进行喂养
+可以允许小猪同时饮用任意数量的桶中的水，并且该过程不需要时间。
+小猪喝完水后，必须有 minutesToDie 分钟的冷却时间。在这段时间里，你只能观察，而不允许继续喂猪。
+过了 minutesToDie 分钟后，所有喝到毒药的猪都会死去，其他所有猪都会活下来。
+重复这一过程，直到时间用完。
+给你桶的数目 buckets ，minutesToDie 和 minutesToTest ，返回在规定时间内判断哪个桶有毒所需的最小猪数。
+*/
+int poorPigs(int buckets, int minutesToDie, int minutesToTest) {
+    int b =minutesToTest/minutesToDie + 1;
+    int k = 0,n = 1;
+    while(n < buckets){k++,n *= b;}
+    return k;
+}
+/**5.lc319灯泡开关
+ * 初始时有n个灯泡处于关闭状态。第一轮，你将会打开所有灯泡。接下来的第二轮，你将会每两个灯泡关闭第二个。
+第三轮，你每三个灯泡就切换第三个灯泡的开关（即，打开变关闭，关闭变打开）。第 i 轮，你每 i 个灯泡就切换第 i 个灯泡的开关。
+ 直到第 n 轮，你只需要切换最后一个灯泡的开关。
+ 找出并返回 n 轮后有多少个亮着的灯泡
+ * */
+int bulbSwitch(int n) {//实际上是求1-n中约数个数是奇数的数的个数，平方数的约数个数是奇数，一位一般约数是成对出现的，如果是奇数，说明一对数是一个数
+    return sqrt(n);
+}
+/**6.lc343整数拆分
+ * 给定一个正整数 n ，将其拆分为 k 个 正整数 的和（ k >= 2 ），并使这些整数的乘积最大化。
+返回 你可以获得的最大乘积 。
+ * */
+int integerBreak(int n) {//将数拆成尽量多的3乘积是最大的，2的个数不能超过2个，4等价于2个2，1对乘积帮助较小，大于等于5的拆成3和n-3的形式
+    if(n <= 3)return n-1;
+    int res = 1;
+    if(n % 3 == 1){
+        res *= 4,
+        n -= 4;
+    }else if(n % 3 == 2){
+        res *= 2;
+        n -= 2;
+    }
+    while (n > 0){
+        res *= 3;
+    }
+    return res;
+}
+/**7.lc650只有两个键的键盘
+ * 最初记事本上只有一个字符 'A' 。你每次可以对这个记事本进行两种操作：
+Copy All（复制全部）：复制这个记事本中的所有字符（不允许仅复制部分字符）。
+Paste（粘贴）：粘贴 上一次 复制的字符。
+给你一个数字n ，你需要使用最少的操作次数，在记事本上输出 恰好n个 'A' 。返回能够打印出n个 'A' 的最少操作次数。
+*/
+int minSteps(int n) {//要得到合数个x，如果ij = p,那么可以通过i+j次操作得到，而且次数更少。其实如果是合数，那么最后答案就是它的质因数的和
+        int res = 0;
+        for(int i = 2;n > 1;i++){
+            while (n % i == 0){//这个i一定是质数，因为它如果有质因子也已经被除过了
+                res += i;
+                n /= i;
+            }
+        }
+    return res;
+}
+/**8.lc223矩形面积
+ * 给你二维平面上两个由直线构成且边与坐标轴平行/垂直 的矩形，请你计算并返回两个矩形覆盖的总面积。
+每个矩形由其左下顶点和右上顶点坐标表示：
+第一个矩形由其左下顶点 (ax1, ay1) 和右上顶点 (ax2, ay2) 定义。
+第二个矩形由其左下顶点 (bx1, by1) 和右上顶点 (bx2, by2) 定义。
+*/
+int computeArea(int ax1, int ay1, int ax2, int ay2, int bx1, int by1, int bx2, int by2) {
+    long long X = min(ax2,bx2) +0ll - max(ax1,bx1);
+    long long Y = min(ay2,by2) +0ll - max(ay1,by1);
+    return (ax2-ax1)*(ay2-ay1) + (bx2-bx1)*(by2-by1) - max(0ll,X)*max(0ll,Y);
+}
+/**9.lc829连续整数求和
+ * 给定一个正整数 n，返回连续正整数满足所有数字之和为 n的组数 。
+ * */
+int consecutiveNumbersSum(int n) {
+    int res = 0;
+    for(int b = 1;b * (b-1) < 2 * n;b++){
+        if(2 * n % b == 0 && (2*n/b - (b-1))%2 == 0)
+            res++;
+    }
+    return res;
+}
+/**lc891子序列宽度之和
+ * 一个序列的宽度定义为该序列中最大元素和最小元素的差值。
+给你一个整数数组nums返回nums的所有非空子序列的宽度之和 。由于答案可能非常大，请返回对 10^9 + 7 取余 后的结果。
+子序列定义为从一个数组里删除一些（或者不删除）元素，但不改变剩下元素的顺序得到的数组。例如，[3,6,2,7] 就是数组 [0,3,1,6,2,2,7] 的一个子序列。
+ * */
+ int mod = 1000000007;
+int sumSubseqWidths(vector<int>& nums) {
+  sort(nums.begin(),nums.end());
+  long long res = 0,p = 1,sum = 0;
+  for(auto x :nums){
+      res  = (res+ x*(p-1)-sum)%mod;
+      sum = (sum*2+x)%mod;
+      p = p *2 %mod;
+  }
+    return (res+mod)%mod;//避免余数是负的
+}
+
+
