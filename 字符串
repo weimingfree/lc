@@ -1,0 +1,429 @@
+#include <iostream>
+#include <set>
+#include <unordered_set>
+#include <vector>
+#include <queue>
+#include <algorithm>
+#include <stack>
+#include <map>
+#include <unordered_map>
+#include <math.h>
+#include <stack>
+using namespace std;
+/**lc38外观数列
+ * */
+string countAndSay(int n) {
+    string s = "1";
+    for(int i = 1;i < n;i++){
+        string ns = "";
+        for(int j = 0; j < s.size();){
+            int u = j;
+            while (u < s.size() && s[u] == s[j])u++;
+            ns += to_string(u-j);
+            ns += s[j];
+            j = u;
+        }
+        s = ns;
+    }
+    return s;
+}
+/**lc49字母异位词分组
+ * 给你一个字符串数组，请你将 字母异位词 组合在一起。可以按任意顺序返回结果列表。
+字母异位词 是由重新排列源单词的字母得到的一个新单词，所有源单词中的字母通常恰好只用一次。
+ * */
+vector<vector<string>> groupAnagrams(vector<string>& strs) {
+    unordered_map<string,vector<string>>hash;
+    for(auto s :strs){
+        string rs = s;
+        sort(s.begin(),s.end());
+        hash[s].push_back(rs);
+    }
+    vector<vector<string>>res;
+    for(auto &group: hash){
+        res.push_back(group.second);
+    }
+    return res;
+}
+/**lc151反转字符串中的单词
+ * 给你一个字符串 s ，请你反转字符串中 单词 的顺序。
+单词 是由非空格字符组成的字符串。s 中使用至少一个空格将字符串中的 单词 分隔开。
+返回 单词 顺序颠倒且 单词 之间用单个空格连接的结果字符串。
+注意：输入字符串 s中可能会存在前导空格、尾随空格或者单词间的多个空格。返回的结果字符串中，单词间应当仅用单个空格分隔，且不包含任何额外的空格
+*/
+void reverseWords(string &s) {
+    int i = 0, k = 0;
+    s += ' ';
+    while (k < s.size() && s[k] == ' ')k++;
+    while (k < s.size()){
+        if(s[k] != ' ')
+        s[i++] = s[k++];
+        else{
+            s[i++] = ' ';
+            while (k < s.size() && s[k] == ' ')k++;
+        }
+    }
+    if(!i){
+        s = "";
+        return;
+    }
+    s.erase(s.begin()+i-1,s.end());
+    for(int i = 0;i < s.size();i++){
+        int j = i;
+        while (j < s.size() && s[j] != ' ')j++;
+        reverse(s.begin()+i,s.begin()+j);
+        i = j;
+    }
+    reverse(s.begin(),s.end());
+}
+/**lc165比较版本号
+ * 你两个版本号 version1 和 version2 ，请你比较它们。
+版本号由一个或多个修订号组成，各修订号由一个 '.' 连接。每个修订号由多位数字组成，可能包含前导零 。每个版本号至少包含一个字符。修订号从左到右编号，
+ 下标从 0 开始，最左边的修订号下标为 0 ，下一个修订号下标为 1 ，以此类推。例如，2.5.33 和 0.1 都是有效的版本号。
+比较版本号时，请按从左到右的顺序依次比较它们的修订号。比较修订号时，只需比较 忽略任何前导零后的整数值 。也就是说，修订号 1 和修订号 001 相等 。
+如果版本号没有指定某个下标处的修订号，则该修订号视为 0 。例如，版本 1.0 小于版本 1.1 ，因为它们下标为 0 的修订号相同，而下标为 1 的修订号分别为 0 和 1 ，0 < 1 。
+返回规则如下：
+如果version1>version2返回1，
+如果version1<version2 返回 -1，
+除此之外返回 0。
+ * */
+vector<int>get_num(string version){
+    vector<int>res;
+    for(int i = 0;i < version.size();i++){
+        int j = i,s = 0;
+        while (j < version.size() && version[j] != '.'){
+            s  = s*10+version[j] - '0';
+            j++;
+        }
+        i = j;
+        res.push_back(s);
+    }
+    while (res.size() && res.back() == 0)res.pop_back();
+    return res;
+}
+int compareVersion(string version1, string version2) {
+    auto n1 = get_num(version1);
+    auto n2 = get_num(version2);
+    if(n1 < n2)return -1;
+    if(n1 == n2)return 0;
+    return 1;
+}
+/**lc5最长回文字串
+ * 给你一个字符串 s，找到 s 中最长的回文子串。
+ * */
+string longestPalindrome(string s) {
+    int len = 0;
+    string ans;
+    for(int k = 0;k < s.size();k++){
+        int i = k,j = k+1;
+        while(i >= 0 && j < s.size() && s[i] == s[j])i--,j++;
+        if(j - i - 1 > len){
+            len = j - i -1;
+            ans = s.substr(i+1,len);
+        }
+        i = k-1,j = k+1;
+        while(i >= 0 && j < s.size() && s[i] == s[j])i--,j++;
+        if(j - i - 1 > len){
+            len = j - i -1;
+            ans = s.substr(i+1,len);
+        }
+    }
+    return ans;
+}
+/**lc273整数转换英文表示
+ *将非负整数 num 转换为其对应的英文表示。
+ * */
+int hundred = 100,thousand = 1000,million = 1000000,billion = 1000000000;
+unordered_map<int,string>numbers;
+string get3(int num){
+    string res;
+    if(num > hundred){
+        res += ' '+numbers[num/hundred] + ' ' + numbers[hundred];
+        num %= hundred;
+    }
+    if(num){
+        if(num < 20)res += ' ' + numbers[num];
+        else if(num % 10 == 0)res += ' ' + numbers[num];
+        else res += ' ' + numbers[num/10*10]+' ' + numbers[num %10];
+    }
+    return res.substr(1);
+}
+string numberToWords(int num) {
+    char number20[][30] = {"Zero","One","Two","Three","Four","Five","Six",
+                            "Seven", "Eight","Nine","Ten","Eleven",
+                            "Twelve",  "Thirteen",  "Fourteen",  "Fifteen",
+                            "Sixteen",  "Seventeen",  "Eighteen",  "Nineteen"};
+    char number2[][30] = {"Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"};
+    for(int i = 0;i < 20;i++)numbers[i]  = number20[i];
+    for(int i = 20,j = 0;j < 100;i+=10,j++)numbers[i] = number2[j];
+    numbers[hundred] = "Hundred",numbers[thousand] = "Thousand",numbers[million] = "Million",numbers[billion] = "Billion";
+    string res;
+    for(int k = 1000000000;k >= 100;k /= 1000){
+        if(num >= k){
+            res += ' ' + get3(num / k) + ' ' + numbers[k];
+            num %= k;
+        }
+    }
+    if(num)res += ' ' + get3(num);
+    if(res.empty())res = ' '+ numbers[0];
+    return res;
+}
+/**lc6Z字形变换
+ **/
+string convert(string s, int numRows) {
+    string res;
+    if(numRows == 1)return s;
+    for(int j = 0;j < numRows;j++){
+        if(j == 0 && j == numRows-1){
+            for(int i = j;i < s.size();i+= (numRows-1)*2)
+                res += s[i];
+        }else{
+            for(int k = j,i = numRows*2-1-j-1;i <s.size() || k < s.size();i+=(numRows-1)*2,k+=(numRows-1)*2){
+                if(k < s.size())res += s[k];
+                if(i < s.size())res += s[i];
+            }
+        }
+    }
+    return res;
+}
+/**lc3无重复字符的最长子串
+ *给定一个字符串 s ，请你找出其中不含有重复字符的 最长子串 的长度。
+ * */
+int lengthOfLongestSubstring(string s) {
+    unordered_map<char,int>hash;
+    int res = 0;
+    for(int i = 0,j = 0;j < s.size();j++){
+        if(++hash[s[j]] > 1){
+            while (i < j){
+                hash[s[j]]--;
+                i++;
+                if(hash[s[j]] == 1)break;
+            }
+        }
+        res = max(res,j-i+1);
+    }
+    return res;
+}
+/**lc166分数到小数
+ * 给定两个整数，分别表示分数的分子numerator 和分母 denominator，以字符串形式返回小数 。
+如果小数部分为循环小数，则将循环的部分括在括号内。
+如果存在多个答案，只需返回 任意一个 。
+对于所有给定的输入，保证 答案字符串的长度小于 104 。
+*/
+string fractionToDecimal(int numerator, int denominator) {
+    long long n = numerator,d = denominator;
+    bool minus = false;
+    if(n < 0)minus =!minus,n = -n;
+    if(d < 0)minus =!minus,d = -d;
+    string res = to_string(n/d);
+    n %= d;
+    if(!n){
+        if(minus && res != "0")return '-'+res;
+        return res;
+    }
+    res += '.';
+    unordered_map<long long,int>hash;
+    while (n){
+        if(hash[n]){
+            res = res.substr(0,hash[n]) + '(' + res.substr(hash[n]) + ')';
+            break;
+        }
+        else hash[n] = res.size();
+        n *= 10;
+        res += to_string(n /d);
+        n %= d;
+    }
+    if(minus)res = '-' + res;
+    return res;
+}
+/**lc208实现Trie(前缀树)
+ *Trie（发音类似 "try"）或者说前缀树是一种树形数据结构，用于高效地存储和检索字符串数据集中的键。这一数据结构有相当多的应用情景，例如自动补完和拼写检查。
+请你实现 Trie 类：
+Trie() 初始化前缀树对象。
+void insert(String word) 向前缀树中插入字符串 word 。
+boolean search(String word)如果字符串 word 在前缀树中，返回 true（即，在检索之前已经插入）；否则，返回 false 。
+boolean startsWith(String prefix) 如果之前已经插入的字符串word 的前缀之一为 prefix ，返回 true ；否则，返回 false 。
+ * */
+struct Node{
+    bool is_end;
+    Node *next[26];
+    Node(){
+        is_end = false;
+        for(int i = 0;i <26;i++)next[i] = 0;
+    }
+};
+Node *root;
+Trie(){
+    root = new Node();
+}
+
+void insert(string word) {
+    Node *p = root;
+    for(char c :word){
+        int son = c-'a';
+        if(!p->next[son])p->next[son] =new Node();
+        p = p ->next[son];
+    }
+    p->is_end = true;
+}
+bool search(string word) {
+    Node *p = root;
+    for(char c : word){
+       if(p->next[c-'a'])p = p->next[c-'a'];
+       else return false;
+    }
+    return p->is_end;
+}
+bool startsWith(string prefix) {
+    Node* p = root;
+    for(char c : prefix){
+        if(p->next[c-'a'])p = p->next[c-'a'];
+        else return false;
+    }
+    return true;
+}
+/**lc131分割回文串
+ *你一个字符串s，请你将s分割成一些子串，使每个子串都是回文串。返回s所有可能的分割方案。*/
+ vector<vector<string>>ans;
+ vector<string>path;
+ bool check(string &now){
+     if(now.empty())return false;
+     for(int i = 0,j = now.size()-1;i<j;i++,j--)
+         if(now[i] != now[j])
+             return false;
+     return true;
+ }
+ void dfs(string now,int u,string &s){
+     if(u == s.size()){
+         if(check(now)){
+             path.push_back(now);
+             ans.push_back(path);
+             path.pop_back();
+         }
+         return;
+     }
+     if(check(now)){
+         path.push_back(now);
+         dfs("",u,s);
+         path.pop_back();
+     }
+     dfs(now+s[u],u+1,s);
+ }
+vector<vector<string>> partition(string s) {
+    dfs("",0,s);
+    return ans;
+}
+/**lc227基本计算器2
+ * 给你一个字符串表达式 s ，请你实现一个基本计算器来计算并返回它的值。
+整数除法仅保留整数部分。
+你可以假设给定的表达式总是有效的。所有中间结果将在[-231, 231- 1] 的范围内。
+*/
+int calculate(string s) {
+    stack<char>op;
+    stack<int>num;
+    s += "+0";
+    for(int i = 0;i < s.size();i++){
+        if(s[i] == ' ')continue;
+        if(s[i] == '*' || s[i] == '/' || s[i] == '+' || s[i] == '-')op.push(s[i]);
+        else{
+            int j = i;
+            while (j < s.size() && s[j] >= '0' && s[j] <= '9')j++;
+            num.push(atoi(s.substr(i,j-i).c_str()));
+            i = j -1;
+            if(!op.empty()){
+                if(op.top() == '*' || op.top() == '/'){
+                    int y = num.top();
+                    num.pop();
+                    int x = num.top();
+                    num.pop();
+                    if(op.top() == '*')num.push(x*y);
+                    else num.push(x/y);
+                    op.pop();
+                }else if(op.size() >= 2){
+                    int z = num.top();num.pop();
+                    int y = num.top();num.pop();
+                    int x = num.top();num.pop();
+                    char op2 = op.top();op.pop();
+                    char op1 = op.top();op.pop();
+                    if(op1 == '+')num.push(x+y),num.push(z);
+                    else num.push(x-y),num.push(z);
+                    op.push(op2);
+                }
+            }
+        }
+    }
+    num.pop();
+    return num.top();
+}
+/**lc30串联所有单词的字串
+ * 给定一个字符串s和一个字符串数组words。words中所有字符串长度相同。
+s中的串联子串是指一个包含words中所有字符串以任意顺序排列连接起来的子串。
+例如，如果words = ["ab","cd","ef"]， 那么"abcdef"，"abefcd"，"cdabef"，"cdefab"，"efabcd"， 和"efcdab" 都是串联子串。"acdbef" 不是串联子串，
+因为他不是任何words排列的连接。
+返回所有串联字串在s中的开始索引。你可以以任意顺序返回答案。
+ * */
+ /**最暴力的做法每次枚举所有子串的开头，然后从这个开头开始，假设所有单词长度是w,假设我们枚举了每个开头i了
+  * [i,i+w）,[i+w,i+2w),...[i+(m-1)*w,i+m*w)把所有的字串抠出来，抠出来我们统计一下，去hashmap里看一下这个单词是否已经用过了，这个单词是否还有，如果没有的话我们就break
+  * 我们要判断一下这一组单词出现的次数是否和hashmap里出现的次数都是一样的，如果某个单词多余了，说明当前方案不合法，直接break就好了。
+  * 怎么判断这组单词和之前单词是一样的呢？每次单词来了之后呢，我们就开一个新的hash表记录一下它的次数，每次新加一个单词的时候我们就判断一下在tdict里面
+  * 这个单词的次数是否小于hashmap里的次数，如果是，说明这个单词可以加进来，如果不是的话，说明要么这个单词出现的次数太多，要末就是这个单词在words里就
+  * 没有出现过，直接break就好了。
+  * 这里的复杂度是多少？枚举开头的复杂度是w,再枚举下长度.n * m * w
+  * 我们可以发现当我们枚举完，假设我们从i开始枚举，假设在我们
+  * 参考双指针，但指针指的是单词。
+  * i = 0,w,2w,3w,..
+  * i = 1,w+1,...
+  * ...
+  * i = w-1(这是最后一次，因为i = w已经在第一次枚举过了)
+  * */
+vector<int> findSubstring(string s, vector<string>& words) {
+    vector<int> res;
+    int n = s.size(),m = words.size(),w = words[0].size();
+    unordered_map<string ,int>hashmap;
+    for(int i = 0;i < m;i++)hashmap[words[i]]++;//words数组里可能有相同的单词，这里统计下每个单词的个数
+    for(int i = 0;i < w;i++){//枚举从0到w-1的位置即可
+        unordered_map<string,int>tdict;
+        int sum = 0;
+        int l = i;
+        for(int j = l;j + w <= n;j += w){
+                string word;
+                if(j - m * w >= l){
+                    word = s.substr(j-m*w,w);
+                    if(tdict[word] == hashmap[word])sum -= hashmap[word];
+                    tdict[word]--;
+                    if(tdict[word] == hashmap[word])sum += hashmap[word];
+                }
+                word = s.substr(j,w);
+                if(hashmap.count(word) == 0){
+                    sum = 0;
+                    tdict.clear();
+                    l = j + w;
+                }else{
+                    if(tdict[word] == hashmap[word])sum -= hashmap[word];
+                    tdict[word]++;
+                    if(tdict[word] == hashmap[word])sum += hashmap[word];
+                }
+                if(sum == m)res.push_back(j-(m-1)*w);
+        }
+    }
+     return res;
+}
+/**lc214最短回文串
+ * 给定一个字符串 s，你可以通过在字符串前面添加字符将其转换为回文串。找到并返回可以用这种方式转换的最短回文串。*/
+/**样例：aacecaaa n = 8
+string shortestPalindrome(string s) {
+    string raws = s;
+    reverse(s.begin(),s.end());
+    s = raws + '#' + s;
+    int n = s.size();
+    vector<int>next(n+1,0);
+    for(int i = 2,j = 0;i <= n;i++){
+        while(j && s[j] != s[i-1])j = next[j];
+        if(s[j] == s[i-1])j++;
+        next[i] = j;
+    }
+    int res = next[n];
+    string sup = raws.substr(res);
+    reverse(sup.begin(),sup.end());
+    return sup + raws;
+}
+
