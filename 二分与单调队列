@@ -1,0 +1,284 @@
+#include <iostream>
+#include <set>
+#include <unordered_set>
+#include <vector>
+#include <queue>
+#include <algorithm>
+#include <stack>
+#include <map>
+#include <unordered_map>
+#include <math.h>
+#include <stack>
+using namespace std;
+/**lc69x的平方根
+ * 给你一个非负整数 x ，计算并返回x的 算术平方根 。
+由于返回类型是整数，结果只保留 整数部分 ，小数部分将被 舍去 。
+注意：不允许使用任何内置指数函数和算符，例如 pow(x, 0.5) 或者 x ** 0.5 。
+ * */
+int mySqrt(int x) {
+    int l = 0,r = x;
+    while (l < r){
+        int mid = (l + r + 1) >> 1;
+        if(mid *1ll* mid <= x) l = mid;
+        else r  = mid - 1;//因为这种情况下mid的值是取不到的
+    }
+    return r;
+}
+/**lc34在排序数组中查找元素的第一个和最后一个位置
+ * 给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
+如果数组中不存在目标值 target，返回[-1, -1]。
+你必须设计并实现时间复杂度为O(log n)的算法解决此问题。
+ * */
+vector<int> searchRange(vector<int>& nums, int target) {
+    if(nums.empty())return vector<int>({-1,-1});
+    vector<int>res;
+    int l = 0,r = nums.size()-1;
+    while (l < r){
+        int mid = l + r >>1;
+        if(nums[mid] >= target)r = mid;
+        else l = mid + 1;
+    }
+    if(nums[r]  != target)return vector<int>({-1,-1});
+    res.push_back(r);
+    l = 0,r = nums.size()-1;
+    while (l < r){
+        int mid = l + r + 1ll >> 1;
+        if(nums[mid] <= target) l = mid;
+        else r = mid - 1;
+    }
+    res.push_back(r);
+    return res;
+}
+/**lc74搜索二维矩阵
+ * 编写一个高效的算法来判断m x n矩阵中，是否存在一个目标值。该矩阵具有如下特性：
+每行中的整数从左到右按升序排列。
+每行的第一个整数大于前一行的最后一个整数。
+*/
+bool searchMatrix(vector<vector<int>>& matrix, int target) {
+    if(matrix.empty() || matrix[0].empty())return false;
+    int n = matrix.size(),m = matrix[0].size();
+    int l = 0, r = n * m -1;
+    while (l < r){
+        int mid = l + r>>1;
+        if(matrix[mid / m][mid % m] >= target)r = mid;
+        else l = mid + 1;
+    }
+    return matrix[r/m][r %m] == target;
+}
+/**lc240搜索二维矩阵II编写一个高效的算法来搜索m x n 矩阵 matrix 中的一个目标值 target 。该矩阵具有以下特性：
+每行的元素从左到右升序排列。
+每列的元素从上到下升序排列。
+*/
+bool searchMatrix(vector<vector<int>>& matrix, int target) {
+    if(matrix.empty() || matrix[0].empty())return false;
+    int i = 0,j = matrix[0].size()-1;
+    while (i < matrix.size() && j >= 0){
+        int t = matrix[i][j];
+        if(t == target)return true;
+        if( t > target)j--;
+        else i++;
+    }
+    return false;
+}
+/**lc153寻找旋转排序数组中的最小值
+ * 已知一个长度为 n 的数组，预先按照升序排列，经由 1 到 n 次 旋转 后，得到输入数组。例如，原数组 nums = [0,1,2,4,5,6,7] 在变化后可能得到：
+若旋转 4 次，则可以得到 [4,5,6,7,0,1,2]
+若旋转 7 次，则可以得到 [0,1,2,4,5,6,7]
+注意，数组 [a[0], a[1], a[2], ..., a[n-1]] 旋转一次 的结果为数组 [a[n-1], a[0], a[1], a[2], ..., a[n-2]] 。
+给你一个元素值 互不相同 的数组 nums ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 最小元素 。
+你必须设计一个时间复杂度为O(log n) 的算法解决此问题
+*/
+int findMin(vector<int>& nums) {
+    if(nums[0] < nums.back())return nums[0];
+    int l = 0, r= nums.size()-1;
+    while (l < r){
+        int mid = l + r >> 1;
+        if(nums[mid] >= nums[0]) l = mid + 1;
+        else r = mid;
+    }
+    return nums[r];
+}
+/**lc162寻找峰值峰值元素是指其值严格大于左右相邻值的元素。
+给你一个整数数组nums，找到峰值元素并返回其索引。数组可能包含多个峰值，在这种情况下，返回任何一个峰值所在位置即可。
+你可以假设nums[-1] = nums[n] = -∞ 。
+你必须实现时间复杂度为 O(log n) 的算法来解决此问题
+*/
+int findPeakElement(vector<int>& nums) {
+    if(nums.size() == 1 || nums[0] > nums[1])return 0;
+    int l = 1 ,r = nums.size()-1;
+    while (l < r){
+        int mid = l + r  + 1>>1;
+        if(nums[mid] > nums[mid-1])l = mid;
+        else r = mid -1;
+    }
+    return r;
+}
+/**lc155最小栈设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。
+实现 MinStack 类:
+MinStack() 初始化堆栈对象。
+void push(int val) 将元素val推入堆栈。
+void pop() 删除堆栈顶部的元素。
+int top() 获取堆栈顶部的元素。
+int getMin() 获取堆栈中的最小元素。
+*/
+stack<int> stackValue;
+stack<int> stackMin;
+MinStack() {
+
+}
+void push(int x) {
+    stackValue.push(x);
+    //多个最小值都要push进去
+    if(stackMin.empty() || stackMin.top() >= x)
+        stackMin.push(x);
+}
+void pop() {
+    if(!stackMin.empty() && stackMin.top() == stackValue.top())
+        stackMin.pop();
+    stackValue.pop();
+}
+int top() {
+    return stackValue.top();
+}
+int getMin() {
+    return stackMin.top();
+}
+/**lc496下一个更大元素I
+ *nums1中数字x的下一个更大元素是指x在nums2中对应位置右侧的第一个比x大的元素。
+
+给你两个没有重复元素的数组nums1和nums2下标从0开始计数,其中nums1是nums2的子集。
+
+对于每个 0 <= i < nums1.length ，找出满足 nums1[i] == nums2[j] 的下标 j ，并且在 nums2 确定 nums2[j] 的 下一个更大元素 。
+ 如果不存在下一个更大元素，那么本次查询的答案是 -1 。
+返回一个长度为nums1.length 的数组 ans 作为答案，满足 ans[i] 是如上所述的 下一个更大元素 。
+ */
+vector<int> nextGreaterElement(vector<int>& nums1, vector<int>& nums2) {
+    stack<int> stk;
+    unordered_map<int,int>hash;
+    for(int i = nums2.size()-1;i >= 0;i--){
+        int t = nums2[i];
+        while (stk.size() && stk.top() <= t)stk.pop();
+        hash[t] = stk.size() ? stk.top() : -1;
+        stk.push(t);
+    }
+    vector<int> res;
+    for(auto x : nums1)res.push_back(hash[x]);
+    return res;
+}
+/**lc84柱状图中的最大矩形
+ * 给定 n 个非负整数，用来表示柱状图中各个柱子的高度。每个柱子彼此相邻，且宽度为 1 。
+求在该柱状图中，能够勾勒出来的矩形的最大面积*/
+int largestRectangleArea(vector<int>& heights) {
+    int n = heights.size(),ans = 0;
+    heights.push_back(-1);//使得所有数字在最后出栈
+    stack<int> st;
+    for(int i = 0;i <= n;i++){
+        //stk里面能够留下来的是下标在左面且高度较低的
+        while (!st.empty() && heights[i] < heights[st.top()]){
+            int cur = st.top();
+            st.pop();
+            if(st.empty())ans = max(ans,heights[cur]*i);
+            else ans = max(ans,heights[cur]*(i-st.top()-1));
+        }
+        st.push(i);
+    }
+    return ans;
+}
+/**lc42接雨水
+ *给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，
+ * 下雨之后能接多少雨水。*/
+int trap(vector<int>& height) {
+    int res = 0;
+    stack<int>sta;
+    for(int i = 0;i < height.size();i++){
+        int level = 0;
+        while (!sta.empty() && height[sta.top()] <= height[i]){
+            res += (height[sta.top()] - level) * (i - sta.top()-1);
+            level = height[sta.top()];
+            sta.pop();
+        }
+        if(!sta.empty())res += (height[i] - level)* (i-sta.top()-1);
+        sta.push(i);
+    }
+    return res;
+}
+/**lc475供暖器冬季已经来临。你的任务是设计一个有固定加热半径的供暖器向所有房屋供暖。
+在加热器的加热半径范围内的每个房屋都可以获得供暖。
+现在，给出位于一条水平线上的房屋houses 和供暖器heaters 的位置，请你找出并返回可以覆盖所有房屋的最小加热半径。
+说明：所有供暖器都遵循你的半径标准，加热的半径也一样。
+*/
+int findRadius(vector<int>& houses, vector<int>& heaters) {
+    //使得大于的等于某数的最小数和小于等于某数的最大数均存在
+    heaters.push_back(INT_MIN),heaters.push_back(INT_MAX);
+    sort(heaters.begin(),heaters.end());
+    int res = 0;
+    for(auto &x : houses){
+        int l = 0,r = heaters.size()-1;
+        while (l < r){
+            int mid = l + r >>1;
+            if(heaters[mid] >= x)r = mid;
+            else l = mid + 1;
+        }
+        res = max(res,(int)min(heaters[r] - 0ll - x,x - 0ll-heaters[r-1]));
+    }
+}
+/**lc239滑动窗口的最大值
+给你一个整数数组 nums，有一个大小为k的滑动窗口从数组的最左侧移动到数组的最右侧。
+你只可以看到在滑动窗口内的k个数字。滑动窗口每次只向右移动一位。
+返回 滑动窗口中的最大值 。*/
+vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+    deque<int> dq;
+    vector<int>res;
+    for(int i = 0,j = 0 ;i < nums.size();i++){
+        while (!dq.empty() && nums[dq.front()] <= nums[i])dq.pop_front();
+        dq.push_front(i);
+        if(i - j + 1 > k){
+            if(dq.back() <= j)dq.pop_back();//这里只写等于也可以通过
+            j++;
+        }
+        if(i - j + 1 == k)res.push_back(nums[dq.back()]);
+    }
+    return res;
+}
+/**lc456132模式给你一个整数数组 nums，数组中共有 n 个整数。
+ 132模式的子序列由三个整数 nums[i]、nums[j] 和 nums[k] 组成，并同时满足：i < j < k 和 nums[i] < nums[k] < nums[j] 。
+如果 nums 中存在 132 模式的子序列 ，返回 true ；否则，返回 false
+*/
+bool find132pattern(vector<int>& nums) {
+    int s3 = INT_MIN;
+    stack<int>stk;
+    for(int i = nums.size()-1;i >= 0;i--){
+        if(nums[i] < s3)return true;
+        while (stk.size() && stk.top() < nums[i]){
+            s3 = max(s3,stk.top());//s3是被弹出来的最大的，而栈里面的top要比s3要大
+            //栈里面的所有数都要比s3大
+            stk.pop();
+        }
+        stk.push(nums[i]);
+    }
+    return false;
+}
+/**lc4寻找两个正序数组的中位数
+ * 给定两个大小分别为 m 和 n 的正序（从小到大）数组nums1和nums2。
+ * 请你找出并返回这两个正序数组的中位数 。
+算法的时间复杂度应该为 O(log (m+n)) 。
+*/
+int findKthNumber(vector<int>& nums1,int i,vector<int> &nums2,int j,int k){
+    //尽量让nums1的剩余的size尽可能小
+    if(nums1.size() - i > nums2.size() - j)return findKthNumber(nums2,j,nums1,i,k);
+    if(nums1.size() == i)return  nums2[j + k -1];
+    if(k == 1)return min(nums1[i],nums2[j]);
+    int si = min(i + k/2,int(nums1.size())),sj = j + k/2;
+    if(nums1[si-1] > nums2[sj-1])return findKthNumber(nums1,i,nums2,j+ k/2,k-k/2);
+    else return findKthNumber(nums1,si,nums2,j,k-(si-i));
+}
+double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+    int total = nums1.size() + nums2.size();
+    if(total % 2 == 0){
+        int left = findKthNumber(nums1,0,nums2,0,total/2);
+        int right = findKthNumber(nums1,0,nums2,0,total/2 + 1);
+        return (left+right)/2.0;
+    } else{
+        return findKthNumber(nums1,0,nums2,0,total/2 + 1);
+    }
+}
