@@ -1,0 +1,323 @@
+#include <iostream>
+#include <set>
+#include <unordered_set>
+#include <vector>
+#include <queue>
+#include <algorithm>
+#include <stack>
+#include <map>
+#include <unordered_map>
+#include <math.h>
+#include <stack>
+#include <list>
+#include <sstream>
+
+using namespace std;
+/**lc1两数之和给定一个整数数组 nums和一个整数目标值 target，请你在该数组中找出 和为目标值 target 的那两个整数，并返回它们的数组下标。
+你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
+你可以按任意顺序返回答案。
+*/
+vector<int> twoSum(vector<int>& nums, int target) {
+    unordered_map<int,int>hash;
+    for(int i = 0;i < nums.size();i++){
+        int t = target - nums[i];
+        if(hash.count(t))return vector<int>({hash[t],i});
+        hash[nums[i]] = i;
+    }
+}
+/**lc454四数相加II
+ * 给你四个整数数组 nums1、nums2、nums3 和 nums4 ，数组长度都是 n ，请你计算有多少个元组 (i, j, k, l) 能满足：
+0 <= i, j, k, l < n
+nums1[i] + nums2[j] + nums3[k] + nums4[l] == 0
+*/
+int fourSumCount(vector<int>& nums1, vector<int>& nums2, vector<int>& nums3, vector<int>& nums4) {
+    unordered_map<int,int>hash;
+    int res = 0;
+    for(auto a :nums1)
+        for(auto b: nums2)
+            hash[a+b]++;
+    for(auto c : nums3)
+        for(auto d : nums4)
+            res += hash[-c-d];
+    return res;
+}
+/**lc560和为K的子数组
+ * 给你一个整数数组 nums 和一个整数 k ，请你统计并返回 该数组中和为 k 的连续子数组的个数 。*/
+int subarraySum(vector<int>& nums, int k) {
+    unordered_map<int,int>hash;
+    hash[0] = 1;
+    int s = 0,res = 0;
+    for(auto x : nums){
+        s += x;
+        res += hash[s-k];
+        hash[s]++;
+    }
+    return res;
+
+}
+/**lc525连续数组
+给定一个二进制数组 nums , 找到含有相同数量的 0 和 1 的最长连续子数组，并返回该子数组的长度。
+*/
+int findMaxLength(vector<int>& nums) {
+    unordered_map<int,int>hash;
+    int res = 0,s = 0;
+    hash[0] = -1;
+    for(int i = 0; i < nums.size();i++){
+        s += nums[i] ? 1 : -1;
+        if(hash.count(s))res = max(res,i - hash[s]);
+        else hash[s] = i;
+    }
+    return res;
+}
+/**lc187重复的DNA序列
+ * DNA序列由一系列核苷酸组成，缩写为'A','C','G'和'T'.。
+例如，"ACGAATTCCG"是一个 DNA序列 。
+在研究 DNA 时，识别 DNA 中的重复序列非常有用。
+给定一个表示 DNA序列 的字符串 s ，
+返回所有在 DNA 分子中出现不止一次的长度为10的序列(子字符串)。你可以按 任意顺序 返回答案。
+*/
+vector<string> findRepeatedDnaSequences(string s) {
+    unordered_map<string,int>hash;
+    vector<string> res;
+    for(int i = 0;i + 10 <= s.size();i++){
+        string str = s.substr(i,10);
+        if(++hash[str] == 2)res.push_back(str);
+    }
+    return res;
+}
+/**lc347前k个高频元素
+ *给你一个整数数组 nums 和一个整数 k ，请你返回其中出现频率前 k 高的元素。
+ *你可以按 任意顺序 返回答案。*/
+vector<int> topKFrequent(vector<int>& nums, int k) {
+    unordered_map<int,int>hash;
+    for(auto x : nums) hash[x]++;//key:元素 value:此元素出现的次数
+    int n = nums.size();
+    vector<int> s(n+1,0);
+    for(auto p : hash)s[p.second]++;//每个次数出现的次数
+    int i = n,t = 0;
+    while (t < k) t += s[i--];//从高次数往下找
+    vector<int>res;
+    for(auto p : hash)
+        if(p.second > i)
+            res.push_back(p.first);
+    return res;
+}
+/**lc350两个数组的交集II
+ * 给你两个整数数组nums1 和 nums2 ，请你以数组形式返回两数组的交集。
+ * 返回结果中每个元素出现的次数，应与元素在两个数组中都出现的次数一致（如果出现次数不一致，则考虑取较小值）。
+ * 可以不考虑输出结果的顺序。
+。*/
+vector<int> intersect(vector<int>& nums1, vector<int>& nums2) {
+    unordered_multiset<int> hash;
+    if(nums1.size() > nums2.size())return intersect(nums2,nums1);
+    for(auto x : nums1)hash.insert(x);
+    vector<int>res;
+    for(auto x : nums2){
+        if(hash.count(x) > 0) {
+            res.push_back(x);
+            auto it = hash.find(x);
+            hash.erase(it);
+        }
+    }
+    return res;
+}
+/**lc706设计哈希映射不使用任何内建的哈希表库设计一个哈希映射（HashMap）。
+实现 MyHashMap 类：
+MyHashMap() 用空映射初始化对象
+void put(int key, int value) 向 HashMap 插入一个键值对 (key, value).
+如果 key 已经存在于映射中，则更新其对应的值 value 。
+int get(int key) 返回特定的 key 所映射的 value ；如果映射中不包含 key 的映射，返回 -1 。
+void remove(key) 如果映射中存在 key 的映射，则移除 key 和它所对应的 value 。
+*/
+class MyHashMap {
+public:
+    const static int N = 20011;//如果是质数模的效果会比较好
+    vector<list<pair<int,int>>>hash;
+    MyHashMap() {
+        hash = vector<list<pair<int,int>>>(N);
+    }
+    list<pair<int,int>>::iterator find(int key){
+        int t = key % N;
+        auto it = hash[t].begin();
+        for(;it != hash[t].end();it++)
+            if(it->first == key)
+                break;
+        return it;
+    }
+    void put(int key, int value) {
+        int t = key % N;
+        auto it = find(key);
+        if(it == hash[t].end())
+            hash[t].push_back(make_pair(key,value));
+        else
+            it->second = value;
+    }
+    int get(int key) {
+        auto it = find(key);
+        if(it == hash[key % N].end())return -1;
+        return it->second;
+    }
+
+    void remove(int key) {
+        int t = key % N;
+        auto it = find(key);
+        if(it != hash[t].end())
+            hash[t].erase(it);
+    }
+};
+/**lc652寻找重复的子树
+给你一棵二叉树的根节点 root，返回所有重复的子树 。
+对于同一类的重复子树，你只需要返回其中任意一棵的根结点即可。
+如果两棵树具有相同的结构和相同的结点值，则认为二者是重复的。
+*/
+struct TreeNode {
+        int val;
+         TreeNode *left;
+         TreeNode *right;
+         TreeNode() : val(0), left(nullptr), right(nullptr) {}
+         TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+         TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+     };
+unordered_map<string,int> hash;
+vector<TreeNode*> ans;
+string dfs(TreeNode *u){
+    if(!u)return "NULL";
+    string  left = dfs(u->left);
+    string right = dfs(u->right);
+    string s = to_string(u->val)+','+left+','+right;
+    if(++hash[s] == 2)ans.push_back(u);
+    return s;
+}
+vector<TreeNode*> findDuplicateSubtrees(TreeNode* root){
+    dfs(root);
+    return ans;
+}
+/**lc290单词规律
+ * 给定一种规律 pattern和一个字符串s，判断s是否遵循相同的规律。
+这里的遵循指完全匹配，例如，pattern里的每个字母和字符串s中的每个非空单词之间存在着双向连接的对应规律
+*/
+bool wordPattern(string pattern, string s) {
+    stringstream raw(s);
+    vector<string> words;
+    string word;
+    while (raw >> word)words.push_back(word);
+    unordered_map<char,string>PS;
+    unordered_map<string,char>SP;
+    if(pattern.size() != words.size())return false;
+    for(int i = 0; i < s.size();i++)
+    {
+        char p = pattern[i];
+        string s = words[i];
+        if(!PS.count(p))PS[p] = s;
+        if(!SP.count(s))SP[s] = p;
+        if(PS[p] != s || SP[s] != p)return false;
+    }
+    return true;
+}
+/**lc554砖墙
+你的面前有一堵矩形的、由 n 行砖块组成的砖墙。这些砖块高度相同（也就是一个单位高）但是宽度不同。
+ 每一行砖块的宽度之和相等。
+你现在要画一条自顶向下的、穿过最少砖块的垂线。如果你画的线只是从砖块的边缘经过，就不算穿过这块砖。
+ 你不能沿着墙的两个垂直边缘之一画线，这样显然是没有穿过一块砖的。
+给你一个二维数组 wall ，该数组包含这堵墙的相关信息。
+其中，wall[i] 是一个代表从左至右每块砖的宽度的数组。
+你需要找出怎样画才能使这条线穿过的砖块数量最少 ，并且返回穿过的砖块数量。
+*/
+int leastBricks(vector<vector<int>>& wall) {
+    unordered_map<int,int>hash;
+    int res = 0;
+    for(auto block : wall){
+        int s = 0;
+        for(int i = 0;i + 1 < block.size();i++){
+            s += block[i];
+            hash[s]++;
+            res = max(res,hash[s]);
+        }
+    }
+    return wall.size() - res;
+}
+/**lc149直线上最多的点数
+ *给你一个数组 points ，其中 points[i] = [xi, yi]
+ * 表示 X-Y 平面上的一个点。求最多有多少个点在同一条直线上。*/
+ struct Point{
+    int x,y;
+    Point():x(0),y(0){}
+    Point(int a,int b):x(a),y(b){}
+ };
+int maxPoints(vector<Point>& points) {
+    if(points.empty())return 0;
+    int res = 1;
+    for(int i = 0;i < points.size();i++){
+        int verticals = 1,duplicates = 0;
+        for(int j = i+1;j < points.size();j++)
+            if(points[i].x == points[j].x){
+                verticals++;
+                if(points[i].y == points[j].y)duplicates++;
+            }
+        unordered_map<long double ,int>hash;
+        for(int j = i+1;j <points.size();j++){
+            if(points[i].x != points[j].x){
+                long double slope = (long double)(points[i].y - points[j].y)/(points[i].x-points[j].y);
+                if(!hash.count(slope))hash[slope] = 2;
+                else  hash[slope]++;
+                res = max(res,hash[slope]+duplicates);
+            }
+        }
+        res = max(res,verticals);
+    }
+    return res;
+}
+/**lc355设计推特
+设计一个简化版的推特(Twitter),
+可以让用户实现发送推文，关注/取消关注其他用户，能够看见关注人（包括自己）的最近 10 条推文。
+实现 Twitter 类：
+Twitter() 初始化简易版推特对象
+void postTweet(int userId, int tweetId) 根据给定的 tweetId 和 userId 创建一条新推文。每次调用此函数都会使用一个不同的 tweetId 。
+List<Integer> getNewsFeed(int userId) 检索当前用户新闻推送中最近  10 条推文的 ID 。新闻推送中的每一项都必须是由用户关注的人或者是用户自己发布的推文。推文必须 按照时间顺序由最近到最远排序 。
+void follow(int followerId, int followeeId) ID 为 followerId 的用户开始关注 ID 为 followeeId 的用户。
+void unfollow(int followerId, int followeeId) ID 为 followerId 的用户不再关注 ID 为 followeeId 的用户。
+*/
+unordered_map<int,vector<pair<int,int>>>posts;
+unordered_map<int,unordered_set<int>>follows;
+int id = 0;
+Twitter() {
+
+}
+void postTweet(int userId, int tweetId) {
+    posts[userId].push_back(make_pair(id++,tweetId));
+}
+
+vector<int> getNewsFeed(int userId) {
+    vector<pair<int,int>> ps;
+    for(auto x :posts[userId])ps.push_back(x);
+    for(auto follow : follows[userId])
+        for(auto x : posts[follow])
+            ps.push_back(x);
+    sort(ps.rbegin(),ps.rend());
+    vector<int>res;
+    for(int i = 0; i < 10 && i < ps.size();i++)
+        res.push_back(ps[i].second);
+    return res;
+}
+void follow(int followerId, int followeeId) {
+    if(followeeId != followerId)
+        follows[followerId].insert(followeeId);
+}
+void unfollow(int followerId, int followeeId) {
+    follows[followerId].erase(followeeId);
+}
+/**lc128最长连续序列
+给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
+请你设计并实现时间复杂度为 O(n) 的算法解决此问题*/
+int longestConsecutive(vector<int>& nums) {
+    int res = 0;
+    unordered_map<int,int>tr_left,tr_right;
+    for(auto &x : nums){
+        int left = tr_right[x-1];
+        int right = tr_left[x+1];
+        tr_left[x-left] = max(tr_left[x-left],left+1+right);
+        tr_right[x+right] = max(tr_right[x+right],left+1+right);
+        res = max(res,left+1+right);
+    }
+    return res;
+}
