@@ -89,7 +89,7 @@ vector<int>singleNumber(vector<int>& nums){
 int getSum(int a,int b){
     if(!b)return a;
     int sum = a ^ b;//不进位加法的结果
-    int carry = (a & b)<<1;//计算进位；第一次进位后左移一位最后一位是0，等下一轮运算的
+    unsigned int carry =(unsigned int) (a & b)<<1;//计算进位；第一次进位后左移一位最后一位是0，等下一轮运算的
     //时候这一位和另一个数的这一位相加，结果还是0，并且又左移一位，保证了最后两位是0，最后carry的结果变成0
     return getSum(sum,carry);//将进位和不进位加法结果相加，什么时候没有进位了，什么时候返回结果
 }
